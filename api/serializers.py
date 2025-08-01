@@ -2,17 +2,7 @@ from rest_framework import serializers
 from .models import Customer
 from .models import Order
 
-class CustomerSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
 
-    def validate_email(self, value):
-        if Customer.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email already exists.")
-        return value
-    class Meta:
-        model = Customer
-        fields = ['id', 'name', 'email', 'phone', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,3 +14,16 @@ class OrderSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("Quantity must be a positive integer.")
         return value
+    
+class CustomerSerializer(serializers.ModelSerializer):
+    orders = OrderSerializer(many=True, read_only=True)
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        if Customer.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
+    class Meta:
+        model = Customer
+        fields = ['id', 'name', 'email', 'phone', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
