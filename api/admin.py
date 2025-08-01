@@ -1,13 +1,18 @@
+# api/admin.py
+
 from django.contrib import admin
+from .models import Custmer, Order
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import CustomerViewSet
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'phone', 'created_at', 'updated_at')
+    search_fields = ('name', 'email')
+    list_filter = ('created_at', 'updated_at')
 
-router = DefaultRouter()
-router.register(r'customers', CustomerViewSet)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'product_name', 'quantity', 'order_date')
+    search_fields = ('product_name',)
+    list_filter = ('order_date',)
 
-urlpatterns = [
-    path('', include(router.urls)),
-    path('admin/', admin.site.urls),
-]
+admin.site.register(Custmer, CustomerAdmin)
+admin.site.register(Order, OrderAdmin)
+
